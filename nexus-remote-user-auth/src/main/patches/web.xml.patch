@@ -1,0 +1,27 @@
+diff --git nexus-oss-webapp-${nexusVersion}/runtime/apps/nexus/webapp/WEB-INF/web.xml runtime/apps/nexus/webapp/WEB-INF/web.xml
+index 2e162ce..3eb9ee0 100644
+--- nexus-oss-webapp-${nexusVersion}/runtime/apps/nexus/webapp/WEB-INF/web.xml
++++ nexus-oss-webapp-${nexusVersion}/runtime/apps/nexus/webapp/WEB-INF/web.xml
+@@ -43,11 +43,11 @@
+       <param-name>config</param-name>
+       <param-value>
+ 			[filters]
+-			authcBasic = org.sonatype.nexus.security.filter.authc.NexusSecureHttpAuthenticationFilter
++			authcBasic = com.redhat.rcm.nexus.security.RemoteUserNxAuthenticationFilter
+ 			authcBasic.applicationName = Sonatype Nexus Repository Manager API
+ 			authcBasic.fakeAuthScheme = false
+ 			
+-			authcNxBasic = org.sonatype.nexus.security.filter.authc.NexusSecureHttpAuthenticationFilter
++			authcNxBasic = com.redhat.rcm.nexus.security.RemoteUserNxAuthenticationFilter
+ 			authcNxBasic.applicationName = Sonatype Nexus Repository Manager API (specialized auth)
+ 			authcNxBasic.fakeAuthScheme = true
+ 
+@@ -71,7 +71,7 @@
+             tgiperms.pathPrefix = /service/local/repo_groups/(.*)/index_content(.*)
+             tgiperms.pathReplacement = /groups/@1@2
+ 
+-			contentAuthcBasic = org.sonatype.nexus.security.filter.authc.NexusSecureHttpAuthenticationFilter
++			contentAuthcBasic = com.redhat.rcm.nexus.security.RemoteUserNxAuthenticationFilter
+ 			contentAuthcBasic.applicationName = Sonatype Nexus Repository Manager
+ 			contentAuthcBasic.fakeAuthScheme = false
+ 

@@ -3,14 +3,9 @@
   <modelVersion>4.0.0</modelVersion>
   
   <groupId>com.redhat.rcm.nexus</groupId>
-  <artifactId>nx-sec</artifactId>
+  <artifactId>nx-sec-parent</artifactId>
   <version>0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
-  
-  <modules>
-    <module>nx-sec-remote-user-auth</module>
-    <module>nx-sec-webapp-reassembly</module>
-  </modules>
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -3,7 +3,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>nx-sec</artifactId>
+    <artifactId>nx-sec-parent</artifactId>
     <groupId>com.redhat.rcm.nexus</groupId>
     <version>0.1-SNAPSHOT</version>
   </parent>
@@ -22,6 +22,13 @@
       <version>${project.version}</version>
       <type>patch</type>
       <classifier>webxml</classifier>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>nx-sec-remote-user-auth</artifactId>
+      <version>${project.version}</version>
+      <type>confxml</type>
+      <classifier>security</classifier>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -68,6 +75,19 @@
               <stripVersion>true</stripVersion>
             </configuration>
           </execution>
+          <execution>
+            <id>copy-conf.xml</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <includeArtifactIds>nx-sec-remote-user-auth</includeArtifactIds>
+              <includeTypes>confxml</includeTypes>
+              <outputDirectory>${project.build.directory}/conf</outputDirectory>
+              <useSubDirectoryPerArtifact>false</useSubDirectoryPerArtifact>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>
@@ -104,6 +124,7 @@
               <descriptors>
                 <descriptor>src/main/assembly/webapp.xml</descriptor>
               </descriptors>
+              <tarLongFileMode>gnu</tarLongFileMode>
               <!-- <appendAssemblyId>false</appendAssemblyId> -->
             </configuration>
           </execution>

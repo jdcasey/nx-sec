@@ -21,11 +21,11 @@
 
   <parent>
     <groupId>com.redhat.rcm.nexus</groupId>
-    <artifactId>nexus-security</artifactId>
+    <artifactId>nx-sec-parent</artifactId>
     <version>0.1-SNAPSHOT</version>
   </parent>
   
-  <artifactId>nexus-remote-user-auth</artifactId>
+  <artifactId>nx-sec-remote-user-auth</artifactId>
   <name>REMOTE_USER Support for Nexus</name>
 
   <dependencies>
@@ -43,6 +43,10 @@
   
   <build>
     <resources>
+      <resource>
+        <directory>src/main/conf</directory>
+        <filtering>true</filtering>
+      </resource>
       <resource>
         <directory>src/main/patches</directory>
         <filtering>true</filtering>
@@ -66,6 +70,11 @@
                   <classifier>webxml</classifier>
                   <type>patch</type>
                   <file>${project.build.outputDirectory}/web.xml.patch</file>
+                </artifact>
+                <artifact>
+                  <classifier>security</classifier>
+                  <type>confxml</type>
+                  <file>${project.build.outputDirectory}/security-configuration.xml</file>
                 </artifact>
               </artifacts>
             </configuration>

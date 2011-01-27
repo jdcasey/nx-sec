@@ -18,6 +18,8 @@
 
 package com.redhat.rcm.nexus.security;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jsecurity.authc.AuthenticationToken;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.sonatype.nexus.security.filter.authc.NexusSecureHttpAuthenticationFilter;
@@ -30,6 +32,8 @@ public class RemoteUserNxAuthenticationFilter
     extends NexusSecureHttpAuthenticationFilter
 {
 
+    private final Log logger = LogFactory.getLog( this.getClass() );
+
     @Override
     protected AuthenticationToken createToken( final ServletRequest request, final ServletResponse response )
     {
@@ -40,10 +44,12 @@ public class RemoteUserNxAuthenticationFilter
 
             if ( remoteUser != null )
             {
+                logger.info( "Authenticating via REMOTE_USER: '" + remoteUser + "'..." );
                 return new UsernamePasswordToken( remoteUser, "REMOTE_USER" );
             }
         }
 
+        logger.info( "Authenticating conventionally..." );
         return super.createToken( request, response );
     }
 

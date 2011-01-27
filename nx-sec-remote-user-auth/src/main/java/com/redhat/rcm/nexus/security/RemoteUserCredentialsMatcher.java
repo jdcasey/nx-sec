@@ -22,62 +22,38 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.jsecurity.authc.AuthenticationException;
 import org.jsecurity.authc.AuthenticationInfo;
 import org.jsecurity.authc.AuthenticationToken;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.jsecurity.authc.credential.CredentialsMatcher;
-import org.jsecurity.authz.AuthorizationInfo;
 import org.jsecurity.realm.AuthenticatingRealm;
-import org.jsecurity.realm.AuthorizingRealm;
 import org.jsecurity.realm.Realm;
-import org.jsecurity.subject.PrincipalCollection;
 import org.sonatype.security.realms.XmlAuthenticatingRealm;
 
-import java.util.Arrays;
-
-@Component( role = Realm.class, hint = RemoteUserRealm.ROLE, description = "REMOTE_USER NOP Authenticating Realm" )
-public class RemoteUserRealm
-    extends AuthorizingRealm
-    implements Realm
+@Component( role = CredentialsMatcher.class, hint = "remote-user", description = "REMOTE_USER Credentials Matcher" )
+public class RemoteUserCredentialsMatcher
+    implements CredentialsMatcher
 {
 
-    public static final String ROLE = "RemoteUserRealm";
-
-    private static final char[] REMOTE_USER_PASSWORD_CHARS = "REMOTE_USER".toCharArray();
+    private final Log logger = LogFactory.getLog( this.getClass() );
 
     @Requirement( role = Realm.class, hint = XmlAuthenticatingRealm.ROLE )
     private AuthenticatingRealm delegate;
 
-    @Requirement( hint = "remote-user" )
-    private CredentialsMatcher credentialsMatcher;
-
-    private final Log logger = LogFactory.getLog( this.getClass() );
-
     @Override
-    protected AuthorizationInfo doGetAuthorizationInfo( final PrincipalCollection principals )
+    public boolean doCredentialsMatch( final AuthenticationToken token, final AuthenticationInfo info )
     {
-        return null;
-    }
-
-    @Override
-    protected AuthenticationInfo doGetAuthenticationInfo( final AuthenticationToken token )
-        throws AuthenticationException
-    {
-        setCredentialsMatcher( credentialsMatcher );
-
-        if ( token instanceof UsernamePasswordToken )
+        if ( ( info instanceof RemoteUserInfo ) && ( token instanceof UsernamePasswordToken ) )
         {
             final UsernamePasswordToken tok = (UsernamePasswordToken) token;
-            if ( Arrays.equals( REMOTE_USER_PASSWORD_CHARS, REMOTE_USER_PASSWORD_CHARS ) )
-            {
-                logger.info( "creating remote-user authentication info..." );
-                return new RemoteUserInfo( tok.getUsername(), getName() );
-            }
+            final RemoteUserInfo inf = (RemoteUserInfo) info;
+
+            logger.info( "verifying remote-user authentication in credentials matcher..." );
+            return tok.getUsername().equals( inf.getUsername() );
         }
 
-        logger.info( "creating conventional authentication info..." );
-        return delegate.getAuthenticationInfo( token );
+        logger.info( "verifying conventional authentication info in credentials matcher..." );
+        return delegate.getCredentialsMatcher().doCredentialsMatch( token, info );
     }
 
 }

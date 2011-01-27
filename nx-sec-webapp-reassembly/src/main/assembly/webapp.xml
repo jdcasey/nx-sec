@@ -10,6 +10,13 @@
       <outputDirectory>/</outputDirectory>
     </fileSet>
   </fileSets>
+  <files>
+    <file>
+      <source>${project.build.directory}/conf/nx-sec-remote-user-auth-${project.version}-security.confxml</source>
+      <outputDirectory>sonatype-work/nexus/conf</outputDirectory>
+      <destName>security-configuration.xml</destName>
+    </file>
+  </files>
   <dependencySets>
     <dependencySet>
       <includes>

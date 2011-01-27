@@ -3,12 +3,12 @@
   <modelVersion>4.0.0</modelVersion>
   
   <groupId>com.redhat.rcm.nexus</groupId>
-  <artifactId>nexus-security</artifactId>
+  <artifactId>nx-sec</artifactId>
   <version>0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   
   <modules>
-    <module>nexus-remote-user-auth</module>
+    <module>nx-sec-remote-user-auth</module>
     <module>nx-sec-webapp-reassembly</module>
   </modules>
   

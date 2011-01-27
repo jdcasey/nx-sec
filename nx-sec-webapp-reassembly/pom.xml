@@ -3,7 +3,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>nexus-security</artifactId>
+    <artifactId>nx-sec</artifactId>
     <groupId>com.redhat.rcm.nexus</groupId>
     <version>0.1-SNAPSHOT</version>
   </parent>
@@ -13,12 +13,12 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>nexus-remote-user-auth</artifactId>
+      <artifactId>nx-sec-remote-user-auth</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>nexus-remote-user-auth</artifactId>
+      <artifactId>nx-sec-remote-user-auth</artifactId>
       <version>${project.version}</version>
       <type>patch</type>
       <classifier>webxml</classifier>
@@ -61,7 +61,7 @@
               <goal>copy-dependencies</goal>
             </goals>
             <configuration>
-              <includeArtifactIds>nexus-remote-user-auth</includeArtifactIds>
+              <includeArtifactIds>nx-sec-remote-user-auth</includeArtifactIds>
               <includeTypes>patch</includeTypes>
               <outputDirectory>${project.build.directory}/patches</outputDirectory>
               <useSubDirectoryPerArtifact>false</useSubDirectoryPerArtifact>

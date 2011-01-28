@@ -1,12 +1,12 @@
 <security-configuration>
   <version>2.0.3</version>
   <enabled>true</enabled>
-  <anonymousAccessEnabled>false</anonymousAccessEnabled>
+  <anonymousAccessEnabled>true</anonymousAccessEnabled>
   <anonymousUsername>anonymous</anonymousUsername>
   <anonymousPassword>anonymous</anonymousPassword>
   <realms>
-    <realm>RemoteUserRealm</realm>
-    <realm>XmlAuthorizingRealm</realm>
+    <realm>RemoteUserAuthenticationRealm</realm>
+    <realm>GracefulUNFAuthorizationRealm</realm>
   </realms>
   
 </security-configuration>

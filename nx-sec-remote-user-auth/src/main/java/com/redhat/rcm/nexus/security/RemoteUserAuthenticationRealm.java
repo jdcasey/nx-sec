@@ -36,13 +36,13 @@ import org.sonatype.security.realms.XmlAuthenticatingRealm;
 
 import java.util.Arrays;
 
-@Component( role = Realm.class, hint = RemoteUserRealm.ROLE, description = "REMOTE_USER NOP Authenticating Realm" )
-public class RemoteUserRealm
+@Component( role = Realm.class, hint = RemoteUserAuthenticationRealm.HINT, description = "REMOTE_USER NOP Authenticating Realm" )
+public class RemoteUserAuthenticationRealm
     extends AuthorizingRealm
     implements Realm
 {
 
-    public static final String ROLE = "RemoteUserRealm";
+    public static final String HINT = "RemoteUserAuthenticationRealm";
 
     private static final char[] REMOTE_USER_PASSWORD_CHARS = "REMOTE_USER".toCharArray();
 
@@ -72,12 +72,12 @@ public class RemoteUserRealm
             if ( Arrays.equals( REMOTE_USER_PASSWORD_CHARS, REMOTE_USER_PASSWORD_CHARS ) )
             {
                 logger.info( "creating remote-user authentication info..." );
-                return new RemoteUserInfo( tok.getUsername(), getName() );
+                final String remoteUser = tok.getUsername();
+                return new RemoteUserInfo( remoteUser, getName() );
             }
         }
 
         logger.info( "creating conventional authentication info..." );
         return delegate.getAuthenticationInfo( token );
     }
-
 }

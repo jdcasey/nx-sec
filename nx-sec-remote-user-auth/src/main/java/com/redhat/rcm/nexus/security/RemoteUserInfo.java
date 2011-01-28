@@ -26,20 +26,25 @@ public class RemoteUserInfo
     implements AuthenticationInfo
 {
 
-    private final String user;
-
     private final String realm;
 
-    public RemoteUserInfo( final String user, final String realm )
+    private final String remoteUser;
+
+    public RemoteUserInfo( final String remoteUser, final String realm )
     {
-        this.user = user;
+        this.remoteUser = remoteUser;
         this.realm = realm;
+    }
+
+    public String getRemoteUser()
+    {
+        return remoteUser;
     }
 
     @Override
     public PrincipalCollection getPrincipals()
     {
-        return new SimplePrincipalCollection( user, realm );
+        return new SimplePrincipalCollection( remoteUser, realm );
     }
 
     @Override
@@ -50,7 +55,7 @@ public class RemoteUserInfo
 
     public String getUsername()
     {
-        return user;
+        return remoteUser;
     }
 
 }

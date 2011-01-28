@@ -26,6 +26,7 @@ import org.jsecurity.authz.AuthorizationException;
 import org.jsecurity.authz.AuthorizationInfo;
 import org.jsecurity.realm.Realm;
 import org.jsecurity.subject.PrincipalCollection;
+import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.realms.XmlAuthorizingRealm;
@@ -48,6 +49,9 @@ public class GracefulUNFAuthorizationRealm
 
     @Requirement
     private PlexusContainer plexus;
+
+    @Requirement
+    private NxSecConfiguration nxSecConfig;
 
     private SecuritySystem securitySystem;
 
@@ -86,10 +90,19 @@ public class GracefulUNFAuthorizationRealm
             final DefaultUser user = new DefaultUser();
 
             user.setUserId( username );
-            user.setEmailAddress( username.indexOf( '@' ) > 0 ? username : username + "@company.com" );
             user.setName( username );
             user.setStatus( UserStatus.active );
             user.setSource( SecurityXmlUserManager.SOURCE );
+
+            try
+            {
+                user.setEmailAddress( username.indexOf( '@' ) > 0 ? username : username + "@"
+                                + nxSecConfig.getEmailDomain() );
+            }
+            catch ( final ConfigurationException e )
+            {
+                throw new AuthorizationException( "Cannot read NxSec configuration.", e );
+            }
 
             try
             {

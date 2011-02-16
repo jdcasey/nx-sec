@@ -49,7 +49,7 @@ public class RemoteUserNxAuthenticationFilter
             }
         }
 
-        logger.info( "Authenticating conventionally..." );
+        logger.warn( "PASS-THROUGH: Authenticating conventionally..." );
         return super.createToken( request, response );
     }
 

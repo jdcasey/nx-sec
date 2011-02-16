@@ -1,15 +1,9 @@
 <assembly>
-  <id>bundle</id>
+  <id>sonatype-work</id>
   <formats>
-    <format>tar.gz</format>
+    <format>zip</format>
   </formats>
   <includeBaseDirectory>false</includeBaseDirectory>
-  <fileSets>
-    <fileSet>
-      <directory>${project.build.directory}/nexus</directory>
-      <outputDirectory>/</outputDirectory>
-    </fileSet>
-  </fileSets>
   <files>
     <file>
       <source>${project.build.directory}/conf/nx-sec-remote-user-auth-${project.version}-security.conf</source>
@@ -22,16 +16,4 @@
       <destName>nx-sec.properties</destName>
     </file>
   </files>
-  <dependencySets>
-    <dependencySet>
-      <includes>
-        <include>*:jar:*</include>
-      </includes>
-      <excludes>
-        <exclude>org.sonatype.nexus:nexus-oss-webapp:*</exclude>
-      </excludes>
-      <useProjectArtifact>false</useProjectArtifact>
-      <outputDirectory>nexus-oss-webapp-${nexusVersion}/runtime/apps/nexus/lib</outputDirectory>
-    </dependencySet>
-  </dependencySets>
 </assembly>

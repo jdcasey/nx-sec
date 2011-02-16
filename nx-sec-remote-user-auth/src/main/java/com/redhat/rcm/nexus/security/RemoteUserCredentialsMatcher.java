@@ -48,11 +48,11 @@ public class RemoteUserCredentialsMatcher
             final UsernamePasswordToken tok = (UsernamePasswordToken) token;
             final RemoteUserInfo inf = (RemoteUserInfo) info;
 
-            logger.info( "verifying remote-user authentication in credentials matcher..." );
+            logger.info( "verifying remote-user authentication in credentials matcher for: " + inf.getUsername() );
             return tok.getUsername().equals( inf.getUsername() );
         }
 
-        logger.info( "verifying conventional authentication info in credentials matcher..." );
+        logger.warn( "PASS-THROUGH: verifying conventional authentication info in credentials matcher..." );
         return delegate.getCredentialsMatcher().doCredentialsMatch( token, info );
     }
 

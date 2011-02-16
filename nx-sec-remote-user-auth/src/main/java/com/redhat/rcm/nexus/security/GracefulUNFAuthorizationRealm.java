@@ -18,6 +18,8 @@
 
 package com.redhat.rcm.nexus.security;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -36,8 +38,6 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserStatus;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 
-import java.util.Set;
-
 @Component( role = Realm.class, hint = GracefulUNFAuthorizationRealm.HINT, description = "Graceful UserNotFound Authorization Realm" )
 public class GracefulUNFAuthorizationRealm
     extends XmlAuthorizingRealm
@@ -48,11 +48,26 @@ public class GracefulUNFAuthorizationRealm
 
     @Requirement
     private PlexusContainer plexus;
+    
+    @Requirement
+    private NxSecConfiguration configuration;
+
+    private final Log logger = LogFactory.getLog( this.getClass() );
 
     private SecuritySystem securitySystem;
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo( final PrincipalCollection principals )
+    {
+        if ( configuration.isAutoCreateEnabled() )
+        {
+            autoCreateOnDemand( principals );
+        }
+
+        return super.doGetAuthorizationInfo( principals );
+    }
+
+    private void autoCreateOnDemand( PrincipalCollection principals )
     {
         final String username = (String) principals.iterator().next();
 
@@ -63,41 +78,39 @@ public class GracefulUNFAuthorizationRealm
         }
         catch ( final ComponentLookupException e )
         {
+            logger.error( "Cannot retrieve handle to security system for user lookup." );
+
             throw new AuthorizationException( "Unable to lookup SecuritySystem", e );
         }
 
-        final Set<User> users = securitySystem.listUsers();
-
-        boolean found = false;
-        if ( users != null && !users.isEmpty() )
+        try
         {
-            for ( final User user : users )
-            {
-                if ( user.getUserId().equals( username ) )
-                {
-                    found = true;
-                    break;
-                }
-            }
+            securitySystem.getUser( username );
         }
-
-        if ( !found )
+        catch ( final UserNotFoundException unfe )
         {
+            final String anonUserId = securitySystem.getAnonymousUsername();
+
+            logger.info( "Cannot find pre-existing user: " + username + ". Creating as a clone of anonymous user: " + anonUserId
+                            + "..." );
+
             final DefaultUser user = new DefaultUser();
 
             user.setUserId( username );
-            user.setEmailAddress( username.indexOf( '@' ) > 0 ? username : username + "@company.com" );
+            user.setEmailAddress( username.indexOf( '@' ) > 0 ? username : username + "@" + configuration.getAutoCreateEmailDomain() );
             user.setName( username );
             user.setStatus( UserStatus.active );
             user.setSource( SecurityXmlUserManager.SOURCE );
 
             try
             {
-                final User anonUser = securitySystem.getUser( securitySystem.getAnonymousUsername() );
+                final User anonUser = securitySystem.getUser( anonUserId );
                 user.setRoles( anonUser.getRoles() );
             }
             catch ( final UserNotFoundException e )
             {
+                logger.error( "Anonymous user is missing. Unable to create user: " + username );
+
                 throw new AuthorizationException( "Anonymous user is missing. Unable to create user: " + username, e );
             }
 
@@ -107,15 +120,17 @@ public class GracefulUNFAuthorizationRealm
             }
             catch ( final InvalidConfigurationException e )
             {
-                throw new AuthorizationException( "Unable to create user: " + username, e );
+                logger.error( "Unable to create user: " + username + ". Invalid configuration: " + e.getMessage() );
+
+                throw new AuthorizationException( "Invalid configuration: " + e.getMessage() + "\nUnable to create user: " + username, e );
             }
             catch ( final NoSuchUserManagerException e )
             {
-                throw new AuthorizationException( "Unable to create user: " + username, e );
+                logger.error( "Unable to create user: " + username + ". No such user manager: " + e.getMessage() );
+
+                throw new AuthorizationException( "No such user-manager: " + e.getMessage() + "\nUnable to create user: " + username, e );
             }
         }
-
-        return super.doGetAuthorizationInfo( principals );
     }
 
     private SecuritySystem getSecuritySystem()

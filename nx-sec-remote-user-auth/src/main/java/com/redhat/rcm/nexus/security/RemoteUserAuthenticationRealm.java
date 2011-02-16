@@ -71,13 +71,13 @@ public class RemoteUserAuthenticationRealm
             final UsernamePasswordToken tok = (UsernamePasswordToken) token;
             if ( Arrays.equals( REMOTE_USER_PASSWORD_CHARS, REMOTE_USER_PASSWORD_CHARS ) )
             {
-                logger.info( "creating remote-user authentication info..." );
+                logger.info( "creating remote-user authentication info for: " + tok.getUsername() );
                 final String remoteUser = tok.getUsername();
                 return new RemoteUserInfo( remoteUser, getName() );
             }
         }
 
-        logger.info( "creating conventional authentication info..." );
+        logger.warn( "PASS-THROUGH: creating conventional authentication info..." );
         return delegate.getAuthenticationInfo( token );
     }
 }

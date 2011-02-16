@@ -7,8 +7,8 @@
     <groupId>com.redhat.rcm.nexus</groupId>
     <version>0.1-SNAPSHOT</version>
   </parent>
-  <artifactId>nx-sec-webapp-reassembly</artifactId>
-  <name>Nexus-Security Webapp Reassembly</name>
+  <artifactId>nx-sec-war-reassembly</artifactId>
+  <name>Nexus-Security WAR Reassembly</name>
   <packaging>pom</packaging>
   
   <dependencies>
@@ -43,10 +43,9 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-oss-webapp</artifactId>
+      <artifactId>nexus-webapp</artifactId>
       <version>${nexusVersion}</version>
-      <classifier>bundle</classifier>
-      <type>tar.gz</type>
+      <type>war</type>
       <scope>provided</scope>
     </dependency>
   </dependencies>
@@ -64,9 +63,8 @@
               <goal>unpack-dependencies</goal>
             </goals>
             <configuration>
-              <includeArtifactIds>nexus-oss-webapp</includeArtifactIds>
-              <includeClassifiers>bundle</includeClassifiers>
-              <includeTypes>tar.gz</includeTypes>
+              <includeArtifactIds>nexus-webapp</includeArtifactIds>
+              <includeTypes>war</includeTypes>
               <outputDirectory>${project.build.directory}/nexus</outputDirectory>
               <useSubDirectoryPerArtifact>false</useSubDirectoryPerArtifact>
               <stripVersion>true</stripVersion>
@@ -117,6 +115,7 @@
               <patchTrackingFile>${project.build.directory}/patches-applied.txt</patchTrackingFile>
               <naturalOrderProcessing>true</naturalOrderProcessing>
               <targetDirectory>${project.build.directory}/nexus</targetDirectory>
+              <strip>5</strip>
             </configuration>
           </execution>
         </executions>
@@ -126,17 +125,28 @@
         <version>2.2</version>
         <executions>
           <execution>
-            <id>reassembly</id>
+            <id>war</id>
             <phase>package</phase>
             <goals>
               <goal>single</goal>
             </goals>
             <configuration>
               <descriptors>
-                <descriptor>src/main/assembly/webapp.xml</descriptor>
+                <descriptor>src/main/assembly/war.xml</descriptor>
               </descriptors>
-              <tarLongFileMode>gnu</tarLongFileMode>
-              <!-- <appendAssemblyId>false</appendAssemblyId> -->
+              <appendAssemblyId>false</appendAssemblyId>
+            </configuration>
+          </execution>
+          <execution>
+            <id>sonatype-work</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>src/main/assembly/sonatype-work.xml</descriptor>
+              </descriptors>
             </configuration>
           </execution>
         </executions>

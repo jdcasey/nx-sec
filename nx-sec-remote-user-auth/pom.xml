@@ -73,8 +73,13 @@
                 </artifact>
                 <artifact>
                   <classifier>security</classifier>
-                  <type>confxml</type>
+                  <type>conf</type>
                   <file>${project.build.outputDirectory}/security-configuration.xml</file>
+                </artifact>
+                <artifact>
+                  <classifier>nxsec</classifier>
+                  <type>conf</type>
+                  <file>${project.build.outputDirectory}/nx-sec.properties</file>
                 </artifact>
               </artifacts>
             </configuration>

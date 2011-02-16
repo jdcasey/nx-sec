@@ -23,6 +23,7 @@
     <groupId>com.redhat.rcm.nexus</groupId>
     <artifactId>nx-sec-parent</artifactId>
     <version>0.1-SNAPSHOT</version>
+    <relativePath>../nx-sec-parent/pom.xml</relativePath>
   </parent>
   
   <artifactId>nx-sec-remote-user-auth</artifactId>

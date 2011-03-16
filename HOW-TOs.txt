@@ -1,0 +1,16 @@
+Disabling Login / Log Out links:
+--------------------------------
+
+    9:23 jdcasey: toby: do you have a second?
+    09:24 toby: jdcasey: sure
+    09:24 jdcasey: toby: I'm working on this modification to nexus that will allow it to use httpd authentication methods by looking for REMOTE_USER in the headers
+    09:25 toby: right
+    09:25 jdcasey: toby: it mostly works, but I still have this login link, which isn't connected to the auth source
+    09:25 jdcasey: is there any way I can knock that link out of the page?
+    09:25 jdcasey: I'm wondering how serious that surgery is :\
+    09:26 jdcasey: in our case, we're assuming that if the user is authenticated (REMOTE_USER exists), then we need to auto-create a user account for them on Nexus
+    09:26 toby: jdcasey: one sec, i think I can find something for you
+    09:26 jdcasey: thanks!
+    09:28 damian: should be able to fiddle around with the following span ids (head-link-l, head-link-m, head-link-r) and set the style 'display:none;'  I think that ought to do it
+    09:29 jdcasey: ah, ok. thanks
+

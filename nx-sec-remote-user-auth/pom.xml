@@ -35,15 +35,19 @@
       <artifactId>junit</artifactId>
     </dependency>
     <dependency>
-    	<groupId>org.sonatype.nexus</groupId>
-    	<artifactId>nexus-rest-api</artifactId>
-    	<version>${nexusVersion}</version>
-    	<scope>provided</scope>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-rest-api</artifactId>
+      <version>${nexusVersion}</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   
   <build>
     <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <targetPath>static</targetPath>
+      </resource>
       <resource>
         <directory>src/main/conf</directory>
         <filtering>true</filtering>
@@ -54,6 +58,41 @@
       </resource>
     </resources>
     <plugins>
+      <plugin>
+        <groupId>net.sf.alchim</groupId>
+        <artifactId>yuicompressor-maven-plugin</artifactId>
+        <version>0.7.1</version>
+        <executions>
+          <execution>
+            <id>compress-js</id>
+            <goals>
+              <goal>compress</goal>
+            </goals>
+            <configuration>
+              <nosuffix>true</nosuffix>
+              <nomunge>true</nomunge>
+              <jswarn>false</jswarn>
+              <aggregations>
+                <aggregation>
+                  <output>${project.build.directory}/classes/static/js/nx-sec-remote-user-auth-all.js</output>
+                  <includes>
+                    <include>${project.build.directory}/classes/static/js/remoteUserAuth/remoteUserAuth.DisableAuthLinks.js</include>
+                  </includes>
+                  <!-- insert new line after each concatenation (default: false) -->
+                  <insertNewLine>true</insertNewLine>
+                </aggregation>
+              </aggregations>
+            </configuration>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-utils</artifactId>
+            <version>1.1</version>
+          </dependency>
+        </dependencies>
+      </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>

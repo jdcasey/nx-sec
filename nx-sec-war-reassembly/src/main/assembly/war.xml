@@ -15,9 +15,6 @@
       <includes>
         <include>*:jar:*</include>
       </includes>
-      <excludes>
-        <exclude>org.sonatype.nexus:nexus-webapp:*</exclude>
-      </excludes>
       <useProjectArtifact>false</useProjectArtifact>
       <outputDirectory>WEB-INF/lib</outputDirectory>
     </dependencySet>

@@ -27,9 +27,6 @@
       <includes>
         <include>*:jar:*</include>
       </includes>
-      <excludes>
-        <exclude>org.sonatype.nexus:nexus-oss-webapp:*</exclude>
-      </excludes>
       <useProjectArtifact>false</useProjectArtifact>
       <outputDirectory>nexus-oss-webapp-${nexusVersion}/runtime/apps/nexus/lib</outputDirectory>
     </dependencySet>

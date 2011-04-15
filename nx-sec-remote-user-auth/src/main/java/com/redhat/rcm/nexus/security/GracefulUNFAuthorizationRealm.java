@@ -20,14 +20,14 @@ package com.redhat.rcm.nexus.security;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.shiro.authz.AuthorizationException;
+import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.realm.Realm;
+import org.apache.shiro.subject.PrincipalCollection;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.jsecurity.authz.AuthorizationException;
-import org.jsecurity.authz.AuthorizationInfo;
-import org.jsecurity.realm.Realm;
-import org.jsecurity.subject.PrincipalCollection;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.realms.XmlAuthorizingRealm;

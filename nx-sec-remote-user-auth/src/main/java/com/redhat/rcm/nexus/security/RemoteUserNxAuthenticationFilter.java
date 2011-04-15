@@ -20,8 +20,8 @@ package com.redhat.rcm.nexus.security;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jsecurity.authc.AuthenticationToken;
-import org.jsecurity.authc.UsernamePasswordToken;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.UsernamePasswordToken;
 import org.sonatype.nexus.security.filter.authc.NexusSecureHttpAuthenticationFilter;
 
 import javax.servlet.ServletRequest;

@@ -16,6 +16,14 @@ Conversation:
     09:26 jdcasey: thanks!
     09:28 damian: should be able to fiddle around with the following span ids (head-link-l, head-link-m, head-link-r) and set the style 'display:none;'  I think that ought to do it
     09:29 jdcasey: ah, ok. thanks
+    ...
+    11:27 toby: jdcasey: sure...
+    11:27 toby: :)
+    11:27 toby: http://pastebin.com/196P8ARG
+    11:27 toby: you should be able to add a js file that does the following
+    11:27 toby: this is from the user signup plugin
+    11:27 jdcasey: toby: wow, great!
+    11:28 toby: but basically you just override those methods (the ones with bad names)
 
 JavaScript change:
 ------------------

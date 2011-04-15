@@ -9,11 +9,18 @@
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <nexusVersion>1.8.0.1</nexusVersion>
+    <nexusVersion>1.9.1</nexusVersion>
   </properties>
   
   <dependencyManagement>
     <dependencies>
+      <!-- <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-parent</artifactId>
+        <version>20</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency> -->
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>

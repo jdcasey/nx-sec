@@ -47,7 +47,7 @@
       <artifactId>nexus-oss-webapp</artifactId>
       <version>${nexusVersion}</version>
       <classifier>bundle</classifier>
-      <type>tar.gz</type>
+      <type>zip</type>
       <scope>provided</scope>
     </dependency>
   </dependencies>
@@ -67,7 +67,7 @@
             <configuration>
               <includeArtifactIds>nexus-oss-webapp</includeArtifactIds>
               <includeClassifiers>bundle</includeClassifiers>
-              <includeTypes>tar.gz</includeTypes>
+              <includeTypes>zip</includeTypes>
               <outputDirectory>${project.build.directory}/nexus</outputDirectory>
               <useSubDirectoryPerArtifact>false</useSubDirectoryPerArtifact>
               <stripVersion>true</stripVersion>

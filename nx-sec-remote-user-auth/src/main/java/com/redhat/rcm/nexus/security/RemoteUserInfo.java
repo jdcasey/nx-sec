@@ -18,13 +18,15 @@
 
 package com.redhat.rcm.nexus.security;
 
-import org.jsecurity.authc.AuthenticationInfo;
-import org.jsecurity.subject.PrincipalCollection;
-import org.jsecurity.subject.SimplePrincipalCollection;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.SimplePrincipalCollection;
 
 public class RemoteUserInfo
     implements AuthenticationInfo
 {
+
+    private static final long serialVersionUID = 2L;
 
     private final String realm;
 

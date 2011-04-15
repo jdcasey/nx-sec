@@ -20,14 +20,14 @@ package com.redhat.rcm.nexus.security;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authc.credential.CredentialsMatcher;
+import org.apache.shiro.realm.AuthenticatingRealm;
+import org.apache.shiro.realm.Realm;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.jsecurity.authc.AuthenticationInfo;
-import org.jsecurity.authc.AuthenticationToken;
-import org.jsecurity.authc.UsernamePasswordToken;
-import org.jsecurity.authc.credential.CredentialsMatcher;
-import org.jsecurity.realm.AuthenticatingRealm;
-import org.jsecurity.realm.Realm;
 import org.sonatype.security.realms.XmlAuthenticatingRealm;
 
 @Component( role = CredentialsMatcher.class, hint = "remote-user", description = "REMOTE_USER Credentials Matcher" )

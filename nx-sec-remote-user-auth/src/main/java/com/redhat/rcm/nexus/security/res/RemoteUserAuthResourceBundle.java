@@ -8,6 +8,11 @@ import org.sonatype.nexus.plugins.rest.DefaultStaticResource;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.plugins.rest.StaticResource;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+@Named("remote-user-auth")
+@Singleton
 public class RemoteUserAuthResourceBundle
     extends AbstractNexusResourceBundle
     implements NexusResourceBundle
@@ -18,7 +23,7 @@ public class RemoteUserAuthResourceBundle
         final List<StaticResource> result = new ArrayList<StaticResource>();
 
         result.add( new DefaultStaticResource( getClass().getResource( "/static/js/nx-sec-remote-user-auth-all.js" ),
-                                               "/js/repoServer/nx-sec-remote-user-auth-all.js",
+                                               "static/js/repoServer/nx-sec-remote-user-auth-all.js",
                                                "application/x-javascript" ) );
 
         return result;

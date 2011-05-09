@@ -22,52 +22,163 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.Permission;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.realms.XmlAuthorizingRealm;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
+import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserStatus;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 
-@Component( role = Realm.class, hint = GracefulUNFAuthorizationRealm.HINT, description = "Graceful UserNotFound Authorization Realm" )
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+@Named( GracefulUNFAuthorizationRealm.ID )
 public class GracefulUNFAuthorizationRealm
     extends XmlAuthorizingRealm
     implements Realm
 {
 
-    public static final String HINT = "GracefulUNFAuthorizationRealm";
+    public static final String ID = "GracefulUNFAuthorizationRealm";
 
-    @Requirement
-    private PlexusContainer plexus;
+//    @Inject
+//    private final PlexusContainer plexus;
     
-    @Requirement
-    private NxSecConfiguration configuration;
+//    @Inject
+    private final NxSecConfiguration configuration;
 
     private final Log logger = LogFactory.getLog( this.getClass() );
 
-    private SecuritySystem securitySystem;
+    private final SecuritySystem securitySystem;
+    
+    private final UserManager userManager;
+    
+    @Inject
+    public GracefulUNFAuthorizationRealm( NxSecConfiguration configuration, SecuritySystem securitySystem, 
+                                          @Named( value = "default" ) UserManager userManager )
+    {
+        this.configuration = configuration;
+        this.securitySystem = securitySystem;
+        this.userManager = userManager;
+    }
+    
+    @Override
+    protected void checkPermission(Permission permission, AuthorizationInfo info) {
+        try
+        {
+            logger.info( "executing checkPermission(..)." );
+            super.checkPermission( permission, info );
+        }
+        catch( RuntimeException e )
+        {
+            logger.error( "error executing checkPermission(..).", e );
+            throw e;
+        }
+        
+        logger.info( "done executing checkPermission(..)." );
+    }
+    
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo( final PrincipalCollection principals )
     {
-        if ( configuration.isAutoCreateEnabled() )
+        AuthorizationInfo result = null;
+        try
         {
-            autoCreateOnDemand( principals );
+            if ( configuration.isAutoCreateEnabled() )
+            {
+                User user = autoCreateOnDemand( principals );
+                if ( user != null )
+                {
+                    Set<String> roles = new LinkedHashSet<String>();
+                    if ( user.getRoles() != null )
+                    {
+                        for ( RoleIdentifier rid : user.getRoles() )
+                        {
+                            roles.add( rid.getRoleId() );
+                        }
+                    }
+                    
+                    result = new SimpleAuthorizationInfo( roles );
+                }
+            }
+        }
+        catch ( ConfigurationException e )
+        {
+            throw new AuthorizationException( "Error loading nx-sec configuration.", e );
+        }
+        
+        if ( result == null )
+        {
+            final String username = (String) principals.iterator().next();
+            logger.info( "delegating doGetAuthorizationInfo(..) for: " + username + "." );
+            
+            try
+            {
+                result = super.doGetAuthorizationInfo( principals );
+            }
+            catch ( AuthorizationException e )
+            {
+                logger.error( "Delegated authorization failed for: " + username + ".", e );
+                throw e;
+            }
         }
 
-        return super.doGetAuthorizationInfo( principals );
+        StringBuilder sb = new StringBuilder();
+        sb.append( "AuthorizationInfo result: " );
+        
+        if ( result.getRoles() != null )
+        {
+            sb.append( "\n\nRoles:" );
+            for ( String role : result.getRoles() )
+            {
+                sb.append( "\n\t" ).append( role );
+            }
+        }
+        
+        if ( result.getStringPermissions() != null )
+        {
+            sb.append( "\n\nString Permissions:" );
+            for ( String perm : result.getStringPermissions() )
+            {
+                sb.append( "\n\t" ).append( perm );
+            }
+        }
+        
+        if ( result.getObjectPermissions() != null )
+        {
+            sb.append( "\n\nObject Permissions:" );
+            for ( Object perm : result.getObjectPermissions() )
+            {
+                sb.append( "\n\t" ).append( perm );
+            }
+        }
+        sb.append("\n\n");
+        
+        logger.info( sb.toString() );
+        
+        return result;
     }
 
-    private void autoCreateOnDemand( PrincipalCollection principals )
+    private User autoCreateOnDemand( PrincipalCollection principals )
     {
         final String username = (String) principals.iterator().next();
 
@@ -83,9 +194,25 @@ public class GracefulUNFAuthorizationRealm
             throw new AuthorizationException( "Unable to lookup SecuritySystem", e );
         }
 
+        User user;
         try
         {
-            securitySystem.getUser( username );
+            user = securitySystem.getUser( username );
+            StringBuffer sb = new StringBuffer();
+            
+            sb.append( "User already exists in Nexus: " ).append( username ).append( ":" );
+            sb.append( "\nUser ID: " ).append( user.getUserId() );
+            sb.append( "\nSource: " ).append( user.getSource() );
+            sb.append( "\nEmail: " ).append( user.getEmailAddress() );
+            
+            Set<RoleIdentifier> roles = user.getRoles();
+            sb.append( "\nRoles: " );
+            for ( RoleIdentifier ri : roles )
+            {
+                sb.append("\n\t").append( ri.getRoleId() );
+            }
+            
+            logger.info( sb.toString() );
         }
         catch ( final UserNotFoundException unfe )
         {
@@ -94,10 +221,18 @@ public class GracefulUNFAuthorizationRealm
             logger.info( "Cannot find pre-existing user: " + username + ". Creating as a clone of anonymous user: " + anonUserId
                             + "..." );
 
-            final DefaultUser user = new DefaultUser();
+            user = new DefaultUser();
 
+            try
+            {
+                user.setEmailAddress( username.indexOf( '@' ) > 0 ? username : username + "@" + configuration.getAutoCreateEmailDomain() );
+            }
+            catch ( ConfigurationException e )
+            {
+                throw new AuthorizationException( "Error loading nx-sec configuration.", e );
+            }
+            
             user.setUserId( username );
-            user.setEmailAddress( username.indexOf( '@' ) > 0 ? username : username + "@" + configuration.getAutoCreateEmailDomain() );
             user.setName( username );
             user.setStatus( UserStatus.active );
             user.setSource( SecurityXmlUserManager.SOURCE );
@@ -117,6 +252,7 @@ public class GracefulUNFAuthorizationRealm
             try
             {
                 securitySystem.addUser( user );
+                user = userManager.addUser( user, "" );
             }
             catch ( final InvalidConfigurationException e )
             {
@@ -131,15 +267,17 @@ public class GracefulUNFAuthorizationRealm
                 throw new AuthorizationException( "No such user-manager: " + e.getMessage() + "\nUnable to create user: " + username, e );
             }
         }
+        
+        return user;
     }
 
     private SecuritySystem getSecuritySystem()
         throws ComponentLookupException
     {
-        if ( securitySystem == null )
-        {
-            securitySystem = plexus.lookup( SecuritySystem.class );
-        }
+//        if ( securitySystem == null )
+//        {
+//            securitySystem = plexus.lookup( SecuritySystem.class );
+//        }
         return securitySystem;
     }
 

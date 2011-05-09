@@ -34,25 +34,38 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.sonatype.security.realms.XmlAuthenticatingRealm;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import java.util.Arrays;
 
-@Component( role = Realm.class, hint = RemoteUserAuthenticationRealm.HINT, description = "REMOTE_USER NOP Authenticating Realm" )
+@Named( RemoteUserAuthenticationRealm.ID )
 public class RemoteUserAuthenticationRealm
     extends AuthorizingRealm
     implements Realm
 {
 
-    public static final String HINT = "RemoteUserAuthenticationRealm";
+    public static final String ID = "RemoteUserAuthenticationRealm";
 
     private static final char[] REMOTE_USER_PASSWORD_CHARS = "REMOTE_USER".toCharArray();
 
-    @Requirement( role = Realm.class, hint = XmlAuthenticatingRealm.ROLE )
-    private AuthenticatingRealm delegate;
+//    @Inject
+//    @Named( XmlAuthenticatingRealm.ROLE )
+    private final AuthenticatingRealm delegate;
 
-    @Requirement( hint = "remote-user" )
-    private CredentialsMatcher credentialsMatcher;
+//    @Inject
+//    @Named( "remote-user" )
+    private final CredentialsMatcher credentialsMatcher;
 
     private final Log logger = LogFactory.getLog( this.getClass() );
+    
+    @Inject
+    public RemoteUserAuthenticationRealm( @Named( XmlAuthenticatingRealm.ROLE ) Realm delegate, 
+                                          @Named( RemoteUserCredentialsMatcher.ID ) CredentialsMatcher credentialsMatcher )
+    {
+        this.delegate = (AuthenticatingRealm) delegate;
+        this.credentialsMatcher = credentialsMatcher;
+    }
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo( final PrincipalCollection principals )

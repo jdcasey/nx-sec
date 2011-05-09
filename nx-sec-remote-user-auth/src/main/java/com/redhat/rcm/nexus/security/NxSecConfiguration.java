@@ -22,10 +22,10 @@ import static org.apache.commons.io.IOUtils.closeQuietly;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+
+import javax.inject.Inject;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,9 +34,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
-@Component( role = NxSecConfiguration.class, description = "Configuration for Nx-Sec" )
+//@Component( role = NxSecConfiguration.class, description = "Configuration for Nx-Sec" )
 public class NxSecConfiguration
-    implements Initializable
 {
 
     private static final String KEY_AUTOCREATE_EMAIL_DOMAIN = "user.autocreate.email.domain";
@@ -49,14 +48,20 @@ public class NxSecConfiguration
 
     private static final boolean DEFAULT_AUTOCREATE_ENABLED = true;
 
-    @Requirement
-    private ApplicationConfiguration appConfiguration;
+//    @Inject
+    private final ApplicationConfiguration appConfiguration;
 
     private boolean loaded = false;
 
     private String autoCreateEmailDomain = DEFAULT_AUTOCREATE_EMAIL_DOMAIN;
 
     private boolean autoCreateEnabled = DEFAULT_AUTOCREATE_ENABLED;
+    
+    @Inject
+    public NxSecConfiguration( ApplicationConfiguration appConfiguration )
+    {
+        this.appConfiguration = appConfiguration;
+    }
 
     public void load()
         throws ConfigurationException
@@ -127,24 +132,37 @@ public class NxSecConfiguration
     }
 
     public String getAutoCreateEmailDomain()
+        throws ConfigurationException
     {
+        checkLoaded();
         return autoCreateEmailDomain;
     }
 
     public boolean isAutoCreateEnabled()
+        throws ConfigurationException
     {
+        checkLoaded();
         return autoCreateEnabled;
     }
 
-    protected NxSecConfiguration setAppConfiguration( ApplicationConfiguration appConfiguration )
+    private synchronized void checkLoaded()
         throws ConfigurationException
     {
-        this.appConfiguration = appConfiguration;
-        
-        load();
-        
-        return this;
+        if ( !loaded )
+        {
+            load();
+        }
     }
+
+//    protected NxSecConfiguration setAppConfiguration( ApplicationConfiguration appConfiguration )
+//        throws ConfigurationException
+//    {
+//        this.appConfiguration = appConfiguration;
+//        
+//        load();
+//        
+//        return this;
+//    }
 
     protected NxSecConfiguration setAutoCreateEmailDomain( String autoCreateEmailDomain )
     {
@@ -156,22 +174,6 @@ public class NxSecConfiguration
     {
         this.autoCreateEnabled = autoCreateEnabled;
         return this;
-    }
-
-    public final synchronized void initialize()
-        throws InitializationException
-    {
-        if ( !loaded )
-        {
-            try
-            {
-                load();
-            }
-            catch ( ConfigurationException e )
-            {
-                throw new InitializationException( "Failed to load Nx-Sec configuration: " + e.getMessage(), e );
-            }
-        }
     }
 
 }

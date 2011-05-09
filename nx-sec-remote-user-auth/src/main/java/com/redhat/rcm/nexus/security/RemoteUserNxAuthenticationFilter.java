@@ -28,11 +28,20 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import java.util.Enumeration;
+
 public class RemoteUserNxAuthenticationFilter
     extends NexusSecureHttpAuthenticationFilter
 {
 
     private final Log logger = LogFactory.getLog( this.getClass() );
+    
+    private static final String HTTPD_NULL = "(null)";
+    
+    private static final String[] USER_HEADERS = {
+      "REMOTE_USER",
+      "X_REMOTE_USER",
+    };
 
     @Override
     protected AuthenticationToken createToken( final ServletRequest request, final ServletResponse response )
@@ -40,11 +49,34 @@ public class RemoteUserNxAuthenticationFilter
         if ( request instanceof HttpServletRequest )
         {
             final HttpServletRequest req = (HttpServletRequest) request;
-            final String remoteUser = req.getHeader( "REMOTE_USER" );
+            
+            StringBuilder sb = new StringBuilder();
+            sb.append( "\n\nHEADERS:" );
+            for( Enumeration<String> e = req.getHeaderNames(); e.hasMoreElements(); )
+            {
+                String name = e.nextElement();
+                for( Enumeration<String> vals = req.getHeaders( name ); vals.hasMoreElements(); )
+                {
+                    sb.append( "\n\t" + name + ": " + vals.nextElement() );
+                }
+            }
+            sb.append( "\n\n" );
+            logger.info( sb.toString() );
+            
+            String remoteUser = null;
+            for ( String headerName : USER_HEADERS )
+            {
+                String val = req.getHeader( headerName );
+                if ( val != null && !val.equalsIgnoreCase( HTTPD_NULL ) )
+                {
+                    remoteUser = val;
+                    logger.info( "Authenticating via " + headerName + " header with value: '" + remoteUser + "'..." );
+                    break;
+                }
+            }
 
             if ( remoteUser != null )
             {
-                logger.info( "Authenticating via REMOTE_USER: '" + remoteUser + "'..." );
                 return new UsernamePasswordToken( remoteUser, "REMOTE_USER" );
             }
         }

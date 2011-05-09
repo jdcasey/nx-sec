@@ -30,15 +30,27 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.security.realms.XmlAuthenticatingRealm;
 
-@Component( role = CredentialsMatcher.class, hint = "remote-user", description = "REMOTE_USER Credentials Matcher" )
+import javax.inject.Inject;
+import javax.inject.Named;
+
+@Named( RemoteUserCredentialsMatcher.ID )
 public class RemoteUserCredentialsMatcher
     implements CredentialsMatcher
 {
+    
+    public static final String ID = "remote-user";
 
     private final Log logger = LogFactory.getLog( this.getClass() );
 
-    @Requirement( role = Realm.class, hint = XmlAuthenticatingRealm.ROLE )
-    private AuthenticatingRealm delegate;
+//    @Inject
+//    @Named( XmlAuthenticatingRealm.ROLE )
+    private final AuthenticatingRealm delegate;
+    
+    @Inject
+    public RemoteUserCredentialsMatcher( @Named( XmlAuthenticatingRealm.ROLE ) Realm delegate )
+    {
+        this.delegate = (AuthenticatingRealm) delegate;
+    }
 
     @Override
     public boolean doCredentialsMatch( final AuthenticationToken token, final AuthenticationInfo info )

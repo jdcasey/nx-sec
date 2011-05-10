@@ -21,6 +21,11 @@
       <outputDirectory>sonatype-work/nexus/conf</outputDirectory>
       <destName>nx-sec.properties</destName>
     </file>
+    <file>
+      <source>${project.build.directory}/js/nx-sec-remote-user-auth-${project.version}-nxsec.js</source>
+      <outputDirectory>nexus-oss-webapp-${nexusVersion}/runtime/apps/nexus/webapp/js/remoteUserAuth</outputDirectory>
+      <destName>nx-sec-remote-user-auth-all.js</destName>
+    </file>
   </files>
   <dependencySets>
     <dependencySet>

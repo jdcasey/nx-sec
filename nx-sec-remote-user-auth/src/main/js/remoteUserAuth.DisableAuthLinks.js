@@ -10,21 +10,40 @@ Ext.override(Sonatype.headLinks, {
       linkEl.on(
         'click',
         function() {
-//          alert( 'Disabled' );
           return false;
         }, 
         this
       );
   },
   
+  updateRightWhenLoggedOut : function(linkEl) {
+    linkEl.update('');
+    linkEl.removeAllListeners();
+    linkEl.setStyle({
+        'display' : 'none',
+      });
+      
+      linkEl.on(
+        'click',
+        function() {
+          return false;
+        }, 
+        this
+      );
+  },
+	  
   updateMiddleWhenLoggedOut : function(linkEl) {
     linkEl.update('');
-    linkEl.update(' | ');
+    
+    linkEl.removeAllListeners();
+    linkEl.setStyle({
+        'display' : 'none',
+      });
   },
   
-  updateLeftWhenLoggedIn : function(linkEl) {
+  updateRightWhenLoggedIn : function(linkEl) {
     linkEl.removeAllListeners();
-    linkEl.update(Sonatype.user.curr.username);
+    linkEl.update("User: " + Sonatype.user.curr.username);
     
     linkEl.setStyle({
       'color' : 'black',
@@ -39,6 +58,6 @@ Ext.override(Sonatype.headLinks, {
       }, 
       this
     );
-  }
-  
+  },
+	  
 });

@@ -49,6 +49,14 @@
       <type>war</type>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>nx-sec-remote-user-auth</artifactId>
+      <version>${project.version}</version>
+      <type>js</type>
+      <classifier>nxsec</classifier>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
   
   <build>
@@ -95,6 +103,19 @@
               <includeArtifactIds>nx-sec-remote-user-auth</includeArtifactIds>
               <includeTypes>conf</includeTypes>
               <outputDirectory>${project.build.directory}/conf</outputDirectory>
+              <useSubDirectoryPerArtifact>false</useSubDirectoryPerArtifact>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-js</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <includeArtifactIds>nx-sec-remote-user-auth</includeArtifactIds>
+              <includeTypes>js</includeTypes>
+              <outputDirectory>${project.build.directory}/js</outputDirectory>
               <useSubDirectoryPerArtifact>false</useSubDirectoryPerArtifact>
             </configuration>
           </execution>

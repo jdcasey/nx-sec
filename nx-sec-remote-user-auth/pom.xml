@@ -45,15 +45,14 @@
   <build>
     <resources>
       <resource>
-        <directory>src/main/resources</directory>
-      </resource>
-      <resource>
         <directory>src/main/conf</directory>
         <filtering>true</filtering>
+        <targetPath>../conf</targetPath>
       </resource>
       <resource>
         <directory>src/main/patches</directory>
         <filtering>true</filtering>
+        <targetPath>../patches</targetPath>
       </resource>
     </resources>
     <plugins>
@@ -73,9 +72,9 @@
               <jswarn>false</jswarn>
               <aggregations>
                 <aggregation>
-                  <output>${project.build.directory}/classes/static/js/nx-sec-remote-user-auth-all.js</output>
+                  <output>${project.build.directory}/nx-sec-remote-user-auth-all.js</output>
                   <includes>
-                    <include>${project.build.directory}/classes/static/js/remoteUserAuth/remoteUserAuth.DisableAuthLinks.js</include>
+                    <include>${project.basedir}/src/main/js/remoteUserAuth.DisableAuthLinks.js</include>
                   </includes>
                   <!-- insert new line after each concatenation (default: false) -->
                   <insertNewLine>true</insertNewLine>
@@ -106,19 +105,24 @@
             <configuration>
               <artifacts>
                 <artifact>
+                  <classifier>nxsec</classifier>
+                  <type>js</type>
+                  <file>${project.build.outputDirectory}/nx-sec-remote-user-auth-all.js</file>
+                </artifact>
+                <artifact>
                   <classifier>webxml</classifier>
                   <type>patch</type>
-                  <file>${project.build.outputDirectory}/web.xml.patch</file>
+                  <file>${project.build.directory}/patches/web.xml.patch</file>
                 </artifact>
                 <artifact>
                   <classifier>security</classifier>
                   <type>conf</type>
-                  <file>${project.build.outputDirectory}/security-configuration.xml</file>
+                  <file>${project.build.directory}/conf/security-configuration.xml</file>
                 </artifact>
                 <artifact>
                   <classifier>nxsec</classifier>
                   <type>conf</type>
-                  <file>${project.build.outputDirectory}/nx-sec.properties</file>
+                  <file>${project.build.directory}/conf/nx-sec.properties</file>
                 </artifact>
               </artifacts>
             </configuration>

@@ -17,10 +17,7 @@ public class RemoteUserAuthIndexHtmlCustomizer
     @Override
     public String getPostHeadContribution( final Map<String, Object> ctx )
     {
-        final String version =
-            getVersionFromJarFile( "/META-INF/maven/com.redhat.rcm.nexus/nx-sec-remote-user-auth/pom.properties" );
-
-        return "<script src=\"static/js/remoteUserAuth/nx-sec-remote-user-auth-all.js" + ( version == null ? "" : "?" + version )
+        return "<script src=\"js/remoteUserAuth/nx-sec-remote-user-auth-all.js"
             + "\" type=\"text/javascript\" charset=\"utf-8\"></script>";
     }
 }

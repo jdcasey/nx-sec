@@ -107,7 +107,7 @@
                 <artifact>
                   <classifier>nxsec</classifier>
                   <type>js</type>
-                  <file>${project.build.outputDirectory}/nx-sec-remote-user-auth-all.js</file>
+                  <file>${project.build.directory}/nx-sec-remote-user-auth-all.js</file>
                 </artifact>
                 <artifact>
                   <classifier>webxml</classifier>

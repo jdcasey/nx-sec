@@ -50,18 +50,18 @@ public class RemoteUserNxAuthenticationFilter
         {
             final HttpServletRequest req = (HttpServletRequest) request;
             
-            StringBuilder sb = new StringBuilder();
-            sb.append( "\n\nHEADERS:" );
-            for( Enumeration<String> e = req.getHeaderNames(); e.hasMoreElements(); )
-            {
-                String name = e.nextElement();
-                for( Enumeration<String> vals = req.getHeaders( name ); vals.hasMoreElements(); )
-                {
-                    sb.append( "\n\t" + name + ": " + vals.nextElement() );
-                }
-            }
-            sb.append( "\n\n" );
-            logger.info( sb.toString() );
+//            StringBuilder sb = new StringBuilder();
+//            sb.append( "\n\nHEADERS:" );
+//            for( Enumeration<String> e = req.getHeaderNames(); e.hasMoreElements(); )
+//            {
+//                String name = e.nextElement();
+//                for( Enumeration<String> vals = req.getHeaders( name ); vals.hasMoreElements(); )
+//                {
+//                    sb.append( "\n\t" + name + ": " + vals.nextElement() );
+//                }
+//            }
+//            sb.append( "\n\n" );
+//            logger.info( sb.toString() );
             
             String remoteUser = null;
             for ( String headerName : USER_HEADERS )

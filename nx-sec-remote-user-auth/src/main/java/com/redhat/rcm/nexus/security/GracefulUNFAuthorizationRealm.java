@@ -26,9 +26,6 @@ import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
@@ -38,16 +35,13 @@ import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
-import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserStatus;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 
-import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -59,25 +53,17 @@ public class GracefulUNFAuthorizationRealm
 
     public static final String ID = "GracefulUNFAuthorizationRealm";
 
-//    @Inject
-//    private final PlexusContainer plexus;
-    
-//    @Inject
     private final NxSecConfiguration configuration;
 
     private final Log logger = LogFactory.getLog( this.getClass() );
 
     private final SecuritySystem securitySystem;
     
-    private final UserManager userManager;
-    
     @Inject
-    public GracefulUNFAuthorizationRealm( NxSecConfiguration configuration, SecuritySystem securitySystem, 
-                                          @Named( value = "default" ) UserManager userManager )
+    public GracefulUNFAuthorizationRealm( NxSecConfiguration configuration, SecuritySystem securitySystem )
     {
         this.configuration = configuration;
         this.securitySystem = securitySystem;
-        this.userManager = userManager;
     }
     
     @Override
@@ -109,6 +95,7 @@ public class GracefulUNFAuthorizationRealm
                 if ( user != null )
                 {
                     Set<String> roles = new LinkedHashSet<String>();
+                    logger.info( "Roles for user: " + user + " are: " + roles );
                     if ( user.getRoles() != null )
                     {
                         for ( RoleIdentifier rid : user.getRoles() )
@@ -233,7 +220,6 @@ public class GracefulUNFAuthorizationRealm
             }
             
             user.setUserId( username );
-            user.setName( username );
             user.setStatus( UserStatus.active );
             user.setSource( SecurityXmlUserManager.SOURCE );
 
@@ -252,7 +238,6 @@ public class GracefulUNFAuthorizationRealm
             try
             {
                 securitySystem.addUser( user );
-                user = userManager.addUser( user, "" );
             }
             catch ( final InvalidConfigurationException e )
             {

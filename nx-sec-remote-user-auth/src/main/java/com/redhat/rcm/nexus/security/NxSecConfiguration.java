@@ -19,9 +19,8 @@
 package com.redhat.rcm.nexus.security;
 
 import static org.apache.commons.io.IOUtils.closeQuietly;
+import static org.apache.commons.lang.StringUtils.isBlank;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 
@@ -42,12 +41,14 @@ public class NxSecConfiguration
 
     private static final String KEY_AUTOCREATE_ENABLED = "user.autocreate.enabled";
 
+    private static final String KEY_TEMPLATE_USER_ID = "user.autocreate.template.user";
+
     private static final String NX_SEC_CONFIG_FILE = "nx-sec.properties";
 
     private static final String DEFAULT_AUTOCREATE_EMAIL_DOMAIN = "company.com";
 
     private static final boolean DEFAULT_AUTOCREATE_ENABLED = true;
-
+    
 //    @Inject
     private final ApplicationConfiguration appConfiguration;
 
@@ -56,6 +57,8 @@ public class NxSecConfiguration
     private String autoCreateEmailDomain = DEFAULT_AUTOCREATE_EMAIL_DOMAIN;
 
     private boolean autoCreateEnabled = DEFAULT_AUTOCREATE_ENABLED;
+
+    private String templateUserId;
     
     @Inject
     public NxSecConfiguration( ApplicationConfiguration appConfiguration )
@@ -81,9 +84,11 @@ public class NxSecConfiguration
                                                         Boolean.toString( DEFAULT_AUTOCREATE_ENABLED ) ) );
 
                 autoCreateEmailDomain =
-                    props.getProperty( KEY_AUTOCREATE_EMAIL_DOMAIN, DEFAULT_AUTOCREATE_EMAIL_DOMAIN ).trim();
+                    props.getProperty( KEY_AUTOCREATE_EMAIL_DOMAIN, DEFAULT_AUTOCREATE_EMAIL_DOMAIN );
                 
-                if ( autoCreateEmailDomain.length() < 1 )
+                templateUserId = props.getProperty( KEY_TEMPLATE_USER_ID );
+                
+                if ( isBlank( autoCreateEmailDomain ) )
                 {
                     autoCreateEmailDomain = DEFAULT_AUTOCREATE_EMAIL_DOMAIN;
                 }
@@ -174,6 +179,13 @@ public class NxSecConfiguration
     {
         this.autoCreateEnabled = autoCreateEnabled;
         return this;
+    }
+
+    public String getTemplateUserId()
+        throws ConfigurationException
+    {
+        checkLoaded();
+        return templateUserId;
     }
 
 }

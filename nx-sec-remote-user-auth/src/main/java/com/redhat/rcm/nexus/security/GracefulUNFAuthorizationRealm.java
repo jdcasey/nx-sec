@@ -70,7 +70,11 @@ public class GracefulUNFAuthorizationRealm
     protected void checkPermission(Permission permission, AuthorizationInfo info) {
         try
         {
-            logger.info( "executing checkPermission(..)." );
+            if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "executing checkPermission(..)." );
+            }
+            
             super.checkPermission( permission, info );
         }
         catch( RuntimeException e )
@@ -79,7 +83,10 @@ public class GracefulUNFAuthorizationRealm
             throw e;
         }
         
-        logger.info( "done executing checkPermission(..)." );
+        if( logger.isDebugEnabled() )
+        {
+            logger.debug( "done executing checkPermission(..)." );
+        }
     }
     
 
@@ -95,7 +102,12 @@ public class GracefulUNFAuthorizationRealm
                 if ( user != null )
                 {
                     Set<String> roles = new LinkedHashSet<String>();
-                    logger.info( "Roles for user: " + user + " are: " + roles );
+                    
+                    if ( logger.isDebugEnabled() )
+                    {
+                        logger.debug( "Roles for user: " + user + " are: " + roles );
+                    }
+                    
                     if ( user.getRoles() != null )
                     {
                         for ( RoleIdentifier rid : user.getRoles() )
@@ -116,7 +128,10 @@ public class GracefulUNFAuthorizationRealm
         if ( result == null )
         {
             final String username = (String) principals.iterator().next();
-            logger.info( "delegating doGetAuthorizationInfo(..) for: " + username + "." );
+            if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "delegating doGetAuthorizationInfo(..) for: " + username + "." );
+            }
             
             try
             {
@@ -129,38 +144,41 @@ public class GracefulUNFAuthorizationRealm
             }
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append( "AuthorizationInfo result: " );
-        
-        if ( result.getRoles() != null )
+        if ( logger.isDebugEnabled() )
         {
-            sb.append( "\n\nRoles:" );
-            for ( String role : result.getRoles() )
+            StringBuilder sb = new StringBuilder();
+            sb.append( "AuthorizationInfo result: " );
+            
+            if ( result.getRoles() != null )
             {
-                sb.append( "\n\t" ).append( role );
+                sb.append( "\n\nRoles:" );
+                for ( String role : result.getRoles() )
+                {
+                    sb.append( "\n\t" ).append( role );
+                }
             }
-        }
-        
-        if ( result.getStringPermissions() != null )
-        {
-            sb.append( "\n\nString Permissions:" );
-            for ( String perm : result.getStringPermissions() )
+            
+            if ( result.getStringPermissions() != null )
             {
-                sb.append( "\n\t" ).append( perm );
+                sb.append( "\n\nString Permissions:" );
+                for ( String perm : result.getStringPermissions() )
+                {
+                    sb.append( "\n\t" ).append( perm );
+                }
             }
-        }
-        
-        if ( result.getObjectPermissions() != null )
-        {
-            sb.append( "\n\nObject Permissions:" );
-            for ( Object perm : result.getObjectPermissions() )
+            
+            if ( result.getObjectPermissions() != null )
             {
-                sb.append( "\n\t" ).append( perm );
+                sb.append( "\n\nObject Permissions:" );
+                for ( Object perm : result.getObjectPermissions() )
+                {
+                    sb.append( "\n\t" ).append( perm );
+                }
             }
+            sb.append("\n\n");
+            
+            logger.debug( sb.toString() );
         }
-        sb.append("\n\n");
-        
-        logger.info( sb.toString() );
         
         return result;
     }
@@ -185,47 +203,61 @@ public class GracefulUNFAuthorizationRealm
         try
         {
             user = securitySystem.getUser( username );
-            StringBuffer sb = new StringBuffer();
             
-            sb.append( "User already exists in Nexus: " ).append( username ).append( ":" );
-            sb.append( "\nUser ID: " ).append( user.getUserId() );
-            sb.append( "\nSource: " ).append( user.getSource() );
-            sb.append( "\nEmail: " ).append( user.getEmailAddress() );
-            
-            Set<RoleIdentifier> roles = user.getRoles();
-            sb.append( "\nRoles: " );
-            for ( RoleIdentifier ri : roles )
+            if ( logger.isDebugEnabled() )
             {
-                sb.append("\n\t").append( ri.getRoleId() );
+                StringBuffer sb = new StringBuffer();
+
+                sb.append( "User already exists in Nexus: " ).append( username ).append( ":" );
+                sb.append( "\nUser ID: " ).append( user.getUserId() );
+                sb.append( "\nSource: " ).append( user.getSource() );
+                sb.append( "\nEmail: " ).append( user.getEmailAddress() );
+
+                Set<RoleIdentifier> roles = user.getRoles();
+                sb.append( "\nRoles: " );
+                for ( RoleIdentifier ri : roles )
+                {
+                    sb.append( "\n\t" ).append( ri.getRoleId() );
+                }
+
+                logger.debug( sb.toString() );
             }
-            
-            logger.info( sb.toString() );
         }
         catch ( final UserNotFoundException unfe )
         {
-            final String anonUserId = securitySystem.getAnonymousUsername();
-
-            logger.info( "Cannot find pre-existing user: " + username + ". Creating as a clone of anonymous user: " + anonUserId
-                            + "..." );
-
-            user = new DefaultUser();
-
+            String templateUserId;
+            String emailDomain;
             try
             {
-                user.setEmailAddress( username.indexOf( '@' ) > 0 ? username : username + "@" + configuration.getAutoCreateEmailDomain() );
+                templateUserId = configuration.getTemplateUserId();
+                emailDomain = configuration.getAutoCreateEmailDomain();
+                
             }
             catch ( ConfigurationException e )
             {
                 throw new AuthorizationException( "Error loading nx-sec configuration.", e );
             }
             
+            if ( templateUserId == null )
+            {
+                templateUserId = securitySystem.getAnonymousUsername();
+            }
+            
+            if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "Cannot find pre-existing user: " + username + ". Creating as a clone of anonymous user: " + templateUserId
+                             + "..." );
+            }
+
+            user = new DefaultUser();
+            user.setEmailAddress( username.indexOf( '@' ) > 0 ? username : username + "@" + emailDomain );
             user.setUserId( username );
             user.setStatus( UserStatus.active );
             user.setSource( SecurityXmlUserManager.SOURCE );
 
             try
             {
-                final User anonUser = securitySystem.getUser( anonUserId );
+                final User anonUser = securitySystem.getUser( templateUserId );
                 user.setRoles( anonUser.getRoles() );
             }
             catch ( final UserNotFoundException e )
